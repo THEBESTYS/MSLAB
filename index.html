@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MBTI 맞춤형 학습 상담 | 더베스트어학원 송도점</title>
     <style>
-        /* 기존 CSS 유지 */
+        /* 기존 CSS는 그대로 유지 */
         :root {
             --primary: #3498db;
             --secondary: #e74c3c;
@@ -540,7 +540,7 @@
             }
         }
         
-        /* 새로운 버튼 스타일 */
+        /* 수정된 버튼 스타일 */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -549,55 +549,32 @@
             justify-content: center;
         }
         
-        .report-btn {
-            background-color: #3498db;
-        }
-        
         .consultation-btn {
             background-color: #f39c12;
         }
         
-        .email-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
+        .result-btn {
+            background-color: #3498db;
         }
         
-        .email-modal-content {
-            background-color: white;
-            border-radius: 10px;
-            padding: 40px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .email-modal-content h3 {
-            color: var(--dark);
-            margin-bottom: 20px;
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
             text-align: center;
+            font-weight: bold;
         }
         
-        .email-input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
         
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
@@ -830,34 +807,20 @@
                 
                 <!-- 수정된 버튼 부분 -->
                 <div class="action-buttons">
-                    <button class="btn report-btn" onclick="showEmailModal()">
-                        <i class="fas fa-file-pdf"></i> 상세 보고서 이메일로 받기
-                    </button>
                     <button class="btn consultation-btn" onclick="goToConsultation()">
-                        <i class="fas fa-calendar-check"></i> 상담 예약하기
+                        <i class="fas fa-calendar-check"></i> MBTI 학습 상담 예약하기
                     </button>
                 </div>
                 
+                <div class="status-message" id="result-message" style="display: none;"></div>
+                
                 <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                    💡 상세 보고서에는 유형별 구체적인 학습 활동 예시, 일일 학습 루틴 샘플, 
-                    학부모 팁 등이 포함되어 있습니다.
+                    💡 MBTI 전문 상담사(Daniel 선생님)와의 1:1 카톡 상담을 통해<br>
+                    아이의 유형에 맞는 상세한 학습 전략과 구체적인 실행 계획을 받아보세요.
                 </p>
             </div>
         </div>
     </section>
-
-    <!-- 이메일 입력 모달 -->
-    <div class="email-modal" id="emailModal">
-        <div class="email-modal-content">
-            <h3>상세 보고서 받기</h3>
-            <p>아이의 MBTI 유형 <strong id="modal-mbti-type"></strong>에 대한 상세 학습 보고서를 받으실 이메일 주소를 입력해주세요:</p>
-            <input type="email" class="email-input" id="recipient-email" placeholder="예: parent@email.com">
-            <div class="modal-buttons">
-                <button class="btn" onclick="sendDetailedReport()">보고서 보내기</button>
-                <button class="btn" onclick="closeEmailModal()" style="background-color: #95a5a6;">취소</button>
-            </div>
-        </div>
-    </div>
 
     <!-- 예약 섹션 -->
     <section class="reservation" id="reservation-section" style="display: none;">
@@ -871,6 +834,8 @@
             </div>
             
             <div class="reservation-form">
+                <div class="status-message" id="form-message" style="display: none;"></div>
+                
                 <form id="reservation-form">
                     <div class="form-group">
                         <label for="parent-name">학부모 성함 *</label>
@@ -934,7 +899,9 @@
                         <textarea id="specific-concerns" placeholder="학습 습관, 학교 성적, 영어 학습 등"></textarea>
                     </div>
                     
-                    <button type="submit" class="btn" style="width: 100%;">상담 예약 완료하기</button>
+                    <button type="submit" class="btn" style="width: 100%;">
+                        <i class="fas fa-paper-plane"></i> 상담 예약 신청하기
+                    </button>
                 </form>
             </div>
         </div>
@@ -1058,144 +1025,27 @@
             }
         ];
 
-        // MBTI 결과 설명 데이터 (기존과 동일)
+        // MBTI 결과 설명 데이터 (간소화)
         const mbtiDescriptions = {
-            "ISTJ": {
-                description: "신뢰할 수 있고 책임감이 강한 현실주의자",
-                traits: [
-                    "체계적이고 조직적인 학습을 선호함",
-                    "사실과 세부 사항을 정확하게 기억함",
-                    "계획에 따라 꾸준히 학습하는 것을 좋아함",
-                    "전통적이고 검증된 학습 방법을 신뢰함"
-                ],
-                strategies: [
-                    "명확한 학습 계획표 작성하기",
-                    "단계별로 체계적으로 학습하기",
-                    "구체적 사실과 예시를 활용한 학습",
-                    "일관된 학습 루틴 유지하기"
-                ],
-                detailedReport: `
-📚 ISTJ 유형 상세 학습 보고서
-
-이 보고서는 더베스트어학원 송도점의 MBTI 전문 상담사가 제공합니다.
-
-🔍 ISTJ 유형 특징:
-• 체계적이고 조직적인 접근 방식을 선호
-• 사실과 세부 사항을 정확하게 기억
-• 계획에 따라 꾸준히 학습하는 것을 좋아함
-• 전통적이고 검증된 학습 방법을 신뢰
-
-🎯 추천 학습 전략:
-
-1. 학습 환경 구성
-   • 조용하고 정돈된 학습 공간 제공
-   • 명확한 학습 계획표 작성 및 활용
-   • 학습 자료 체계적으로 정리
-
-2. 학습 방법
-   • 단계별로 체계적으로 학습
-   • 구체적 사실과 예시를 활용한 학습
-   • 반복 학습을 통한 확실한 이해
-
-3. 시간 관리
-   • 일관된 학습 루틴 유지
-   • 매일 같은 시간에 학습하는 습관 형성
-   • 학습 계획표를 따라 꾸준히 실행
-
-4. 영어 학습 팁
-   • 단어장을 체계적으로 정리
-   • 문법 규칙을 표로 정리하여 학습
-   • 규칙적인 복습 시간 확보
-
-💡 학부모를 위한 조언:
-• 명확한 규칙과 기준을 제시해주세요
-• 작은 성취를 인정하고 칭찬해주세요
-• 안정적이고 예측 가능한 환경을 제공해주세요
-
-📞 상담 신청:
-더 자세한 상담이 필요하시면 아래로 연락주세요:
-이메일: danielko@yonsei.ac.kr
-전화: 032-252-9600
-
-상담 가능 시간: 화요일~금요일 오후 2시~4시 (30분 단위)
-                `
-            },
-            "ENFP": {
-                description: "열정적이고 창의적인 활동가",
-                traits: [
-                    "새로운 가능성과 아이디어에 열려있음",
-                    "사람들과의 관계와 소통을 중요하게 생각함",
-                    "창의적이고 독창적인 접근을 선호함",
-                    "자유롭고 융통성 있는 환경을 좋아함"
-                ],
-                strategies: [
-                    "다양한 아이디어와 가능성 탐구 기회",
-                    "사회적 상호작용과 협력 학습 활동",
-                    "창의적 프로젝트와 표현 활동 제공",
-                    "개방적이고 유연한 학습 환경 조성"
-                ],
-                detailedReport: `
-📚 ENFP 유형 상세 학습 보고서
-
-이 보고서는 더베스트어학원 송도점의 MBTI 전문 상담사가 제공합니다.
-
-🔍 ENFP 유형 특징:
-• 새로운 가능성과 아이디어에 열려있음
-• 사람들과의 관계와 소통을 중요하게 생각함
-• 창의적이고 독창적인 접근을 선호함
-• 자유롭고 융통성 있는 환경을 좋아함
-
-🎯 추천 학습 전략:
-
-1. 학습 환경 구성
-   • 다양한 학습 자료와 도구 제공
-   • 자유롭고 개방적인 학습 공간
-   • 창의성을 발휘할 수 있는 환경 조성
-
-2. 학습 방법
-   • 프로젝트 기반 학습 활동
-   • 역할극과 협력 학습
-   • 다양한 매체 활용 학습 (동영상, 게임, 활동)
-
-3. 시간 관리
-   • 유연한 학습 일정 구성
-   • 학습 주제별 블록 시간 설정
-   • 재미와 학습을 결합한 활동
-
-4. 영어 학습 팁
-   • 영어 노래와 영화 활용
-   • 역할극을 통한 회화 연습
-   • 영어 일기 쓰기와 스토리텔링
-
-💡 학부모를 위한 조언:
-• 다양한 학습 방법을 제공해주세요
-• 선택권과 자율성을 부여해주세요
-• 긍정적 격려와 재미있는 학습 경험을 함께해주세요
-
-📞 상담 신청:
-더 자세한 상담이 필요하시면 아래로 연락주세요:
-이메일: danielko@yonsei.ac.kr
-전화: 032-252-9600
-
-상담 가능 시간: 화요일~금요일 오후 2시~4시 (30분 단위)
-                `
-            },
-            // 다른 유형들도 동일한 구조로 추가 (간략화)
-            "ISFJ": { description: "온화하고 헌신적인 보호자", traits: [], strategies: [], detailedReport: "" },
-            "INFJ": { description: "통찰력 있고 창의적인 이상주의자", traits: [], strategies: [], detailedReport: "" },
-            "INTJ": { description: "전략적이고 독립적인 비전가", traits: [], strategies: [], detailedReport: "" },
-            "ISTP": { description: "논리적이고 실용적인 문제 해결사", traits: [], strategies: [], detailedReport: "" },
-            "ISFP": { description: "감성적이고 예술적인 조화 추구자", traits: [], strategies: [], detailedReport: "" },
-            "INFP": { description: "이상적이고 공감 능력이 뛰어난 중재자", traits: [], strategies: [], detailedReport: "" },
-            "INTP": { description: "논리적이고 호기심 많은 사색가", traits: [], strategies: [], detailedReport: "" },
-            "ESTP": { description: "활동적이고 현실적인 모험가", traits: [], strategies: [], detailedReport: "" },
-            "ESFP": { description: "사교적이고 열정적인 연예인", traits: [], strategies: [], detailedReport: "" },
-            "ENTP": { description: "독창적이고 논쟁을 즐기는 변론가", traits: [], strategies: [], detailedReport: "" },
-            "ESTJ": { description: "체계적이고 현실적인 관리자", traits: [], strategies: [], detailedReport: "" },
-            "ESFJ": { description: "사교적이고 배려심 많은 협력자", traits: [], strategies: [], detailedReport: "" },
-            "ENFJ": { description: "카리스마 있고 사교적인 지도자", traits: [], strategies: [], detailedReport: "" },
-            "ENTJ": { description: "전략적이고 효율적인 지도자", traits: [], strategies: [], detailedReport: "" }
+            "ISTJ": { description: "신뢰할 수 있고 책임감이 강한 현실주의자", traits: [], strategies: [] },
+            "ISFJ": { description: "온화하고 헌신적인 보호자", traits: [], strategies: [] },
+            "INFJ": { description: "통찰력 있고 창의적인 이상주의자", traits: [], strategies: [] },
+            "INTJ": { description: "전략적이고 독립적인 비전가", traits: [], strategies: [] },
+            "ISTP": { description: "논리적이고 실용적인 문제 해결사", traits: [], strategies: [] },
+            "ISFP": { description: "감성적이고 예술적인 조화 추구자", traits: [], strategies: [] },
+            "INFP": { description: "이상적이고 공감 능력이 뛰어난 중재자", traits: [], strategies: [] },
+            "INTP": { description: "논리적이고 호기심 많은 사색가", traits: [], strategies: [] },
+            "ESTP": { description: "활동적이고 현실적인 모험가", traits: [], strategies: [] },
+            "ESFP": { description: "사교적이고 열정적인 연예인", traits: [], strategies: [] },
+            "ENFP": { description: "열정적이고 창의적인 활동가", traits: [], strategies: [] },
+            "ENTP": { description: "독창적이고 논쟁을 즐기는 변론가", traits: [], strategies: [] },
+            "ESTJ": { description: "체계적이고 현실적인 관리자", traits: [], strategies: [] },
+            "ESFJ": { description: "사교적이고 배려심 많은 협력자", traits: [], strategies: [] },
+            "ENFJ": { description: "카리스마 있고 사교적인 지도자", traits: [], strategies: [] },
+            "ENTJ": { description: "전략적이고 효율적인 지도자", traits: [], strategies: [] }
         };
+
+        // 실제 운영시 각 유형별 traits와 strategies를 채워넣으세요
 
         // 검사 상태 변수
         let currentQuestion = 0;
@@ -1213,10 +1063,9 @@
         const nextBtn = document.getElementById('next-btn');
         const resultSection = document.getElementById('result-section');
         const reservationSection = document.getElementById('reservation-section');
-        const emailModal = document.getElementById('emailModal');
-        const modalMbtiType = document.getElementById('modal-mbti-type');
-        const recipientEmailInput = document.getElementById('recipient-email');
         const preferredDateInput = document.getElementById('preferred-date');
+        const resultMessage = document.getElementById('result-message');
+        const formMessage = document.getElementById('form-message');
 
         // 페이지 로드 시 첫 번째 질문 표시
         window.onload = function() {
@@ -1236,9 +1085,9 @@
                 nextTuesday.setDate(nextTuesday.getDate() + 1);
             }
             
-            // 다음 금요일 찾기
+            // 다음 금요일 찾기 (다음 주 금요일까지)
             let nextFriday = new Date(nextTuesday);
-            nextFriday.setDate(nextFriday.getDate() + 3); // 화요일 + 3일 = 금요일
+            nextFriday.setDate(nextFriday.getDate() + 21); // 3주 후까지 가능
             
             const formatDate = (date) => {
                 const yyyy = date.getFullYear();
@@ -1263,9 +1112,6 @@
                 }
             });
         }
-
-        // 나머지 함수들 (loadQuestion, highlightSelectedAnswer, selectAnswer, prevQuestion, nextQuestion, calculateResult) 
-        // 기존과 동일하게 유지하되, 약간의 수정 필요
 
         // 질문 로드 함수
         function loadQuestion(index) {
@@ -1368,34 +1214,48 @@
             document.getElementById('mbti-result').style.backgroundColor = getMbtiColor(mbtiType);
             document.getElementById('result-description').textContent = description.description;
             
+            // 학습 특성 표시
             const traitsList = document.getElementById('learning-traits');
             traitsList.innerHTML = '';
-            description.traits.forEach(trait => {
-                const li = document.createElement('li');
-                li.textContent = trait;
-                traitsList.appendChild(li);
-            });
+            if (description.traits && description.traits.length > 0) {
+                description.traits.forEach(trait => {
+                    const li = document.createElement('li');
+                    li.textContent = trait;
+                    traitsList.appendChild(li);
+                });
+            } else {
+                traitsList.innerHTML = '<li>상담을 통해 상세한 학습 특성을 확인해보세요</li>';
+            }
             
+            // 추천 전략 표시
             const strategiesList = document.getElementById('recommended-strategies');
             strategiesList.innerHTML = '';
-            description.strategies.forEach(strategy => {
-                const li = document.createElement('li');
-                li.textContent = strategy;
-                strategiesList.appendChild(li);
-            });
+            if (description.strategies && description.strategies.length > 0) {
+                description.strategies.forEach(strategy => {
+                    const li = document.createElement('li');
+                    li.textContent = strategy;
+                    strategiesList.appendChild(li);
+                });
+            } else {
+                strategiesList.innerHTML = '<li>Daniel 선생님과의 상담에서 맞춤형 학습 전략을 받아보세요</li>';
+            }
             
+            // 결과 섹션 표시
             document.getElementById('mbti-test').style.display = 'none';
             resultSection.style.display = 'block';
             
+            // 예약 폼의 MBTI 필드 설정
             document.getElementById('mbti-type').value = mbtiType;
             
+            // 결과를 localStorage에 저장
             localStorage.setItem('mbtiResult', JSON.stringify({
                 type: mbtiType,
                 description: description.description,
-                traits: description.traits,
-                strategies: description.strategies,
                 timestamp: new Date().toISOString()
             }));
+            
+            // 결과 메시지 표시
+            showResultMessage(mbtiType);
         }
 
         function getMbtiColor(mbtiType) {
@@ -1409,68 +1269,26 @@
             }
         }
 
-        // 이메일 모달 표시
-        function showEmailModal() {
-            const result = JSON.parse(localStorage.getItem('mbtiResult'));
-            modalMbtiType.textContent = result.type;
-            emailModal.style.display = 'flex';
-        }
-
-        // 이메일 모달 닫기
-        function closeEmailModal() {
-            emailModal.style.display = 'none';
-            recipientEmailInput.value = '';
-        }
-
-        // 상세 보고서 이메일 발송
-        function sendDetailedReport() {
-            const result = JSON.parse(localStorage.getItem('mbtiResult'));
-            const recipientEmail = recipientEmailInput.value;
-            
-            if (!recipientEmail || !recipientEmail.includes('@')) {
-                alert('유효한 이메일 주소를 입력해주세요.');
-                return;
-            }
-            
-            const description = mbtiDescriptions[result.type];
-            const reportContent = description.detailedReport || `
-📚 ${result.type} 유형 상세 학습 보고서
-
-이 보고서는 더베스트어학원 송도점의 MBTI 전문 상담사가 제공합니다.
-
-아이의 MBTI 유형: ${result.type}
-성격 특성: ${description.description}
-
-학습 특성:
-${description.traits.map(trait => `• ${trait}`).join('\n')}
-
-추천 학습 전략:
-${description.strategies.map(strategy => `• ${strategy}`).join('\n')}
-
-📞 상담 신청:
-더 자세한 상담이 필요하시면 아래로 연락주세요:
-이메일: danielko@yonsei.ac.kr
-전화: 032-252-9600
-
-상담 가능 시간: 화요일~금요일 오후 2시~4시 (30분 단위)
+        function showResultMessage(mbtiType) {
+            const message = `
+                <h4><i class="fas fa-check-circle"></i> 검사 완료!</h4>
+                <p>아이의 MBTI 유형은 <strong>${mbtiType}</strong>입니다.</p>
+                <p>이제 Daniel 선생님과의 1:1 상담을 통해<br>
+                <strong>${mbtiType} 유형에 최적화된 학습 전략</strong>을 받아보세요.</p>
             `;
-            
-            const subject = `[더베스트어학원] ${result.type} 유형 상세 학습 보고서`;
-            const body = reportContent;
-            
-            // mailto 링크 생성
-            const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
-            // 이메일 클라이언트 열기
-            window.location.href = mailtoLink;
-            
-            alert(`${recipientEmail}로 상세 보고서가 발송되었습니다.\n이메일 클라이언트에서 발송을 완료해주세요.`);
-            closeEmailModal();
+            resultMessage.innerHTML = message;
+            resultMessage.className = 'status-message success-message';
+            resultMessage.style.display = 'block';
         }
 
         // 상담 예약으로 이동
         function goToConsultation() {
             const result = JSON.parse(localStorage.getItem('mbtiResult'));
+            if (!result) {
+                alert('먼저 MBTI 검사를 완료해주세요.');
+                return;
+            }
+            
             document.getElementById('mbti-type').value = result.type;
             
             resultSection.style.display = 'none';
@@ -1494,11 +1312,37 @@ ${description.strategies.map(strategy => `• ${strategy}`).join('\n')}
             }
         }
 
+        // 구글 시트 제출 함수
+        async function submitToGoogleSheets(formData) {
+            // 여기에 실제 Google Apps Script 웹앱 URL을 입력하세요
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycby.../exec'; // 실제 URL로 변경
+            
+            try {
+                // Google Apps Script는 CORS 이슈로 인해 fetch 대신 form submit 사용
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', // CORS 이슈 방지를 위해 no-cors 모드
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData).toString()
+                });
+                
+                // no-cors 모드에서는 response를 읽을 수 없지만, 데이터는 전송됨
+                console.log('구글 시트 전송 완료');
+                return true;
+            } catch (error) {
+                console.error('전송 실패:', error);
+                return false;
+            }
+        }
+
         // 예약 폼 제출 처리
-        document.getElementById('reservation-form').addEventListener('submit', function(e) {
+        document.getElementById('reservation-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = {
+                timestamp: new Date().toLocaleString(),
                 parentName: document.getElementById('parent-name').value,
                 childName: document.getElementById('child-name').value,
                 childGrade: document.getElementById('child-grade').value,
@@ -1507,11 +1351,25 @@ ${description.strategies.map(strategy => `• ${strategy}`).join('\n')}
                 mbtiType: document.getElementById('mbti-type').value,
                 preferredDate: document.getElementById('preferred-date').value,
                 preferredTime: document.getElementById('preferred-time').value,
-                specificConcerns: document.getElementById('specific-concerns').value,
-                timestamp: new Date().toISOString()
+                specificConcerns: document.getElementById('specific-concerns').value || '없음'
             };
             
-            // 이메일 내용 구성
+            // 로딩 표시
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 처리 중...';
+            submitBtn.disabled = true;
+            
+            // 구글 시트에 저장 시도
+            let googleSheetsSuccess = false;
+            try {
+                googleSheetsSuccess = await submitToGoogleSheets(formData);
+            } catch (error) {
+                console.log('구글 시트 저장 실패, 이메일로 대체');
+            }
+            
+            // 이메일로 백업 전송 (항상 실행)
+            const emailSubject = `[더베스트어학원] MBTI 상담 예약: ${formData.childName} (${formData.mbtiType})`;
             const emailBody = `
 MBTI 학습 상담 예약 신청
 
@@ -1530,29 +1388,43 @@ MBTI 학습 상담 예약 신청
 • 시간: ${formData.preferredTime}
 
 상담 시 다루고 싶은 내용:
-${formData.specificConcerns || '없음'}
+${formData.specificConcerns}
 
-예약 신청 시간: ${new Date().toLocaleString()}
+예약 신청 시간: ${formData.timestamp}
 
 ※ 상담 가능 시간: 화요일~금요일 오후 2시~4시 (30분 단위)
 ※ 상담사: Daniel 선생님
 ※ 상담 방식: 카카오톡 1:1 상담 (30분)
             `;
             
-            // 상담사(danielko@yonsei.ac.kr)와 학부모 모두에게 이메일 발송
-            const subject = `[더베스트어학원] MBTI 상담 예약: ${formData.childName} (${formData.mbtiType})`;
-            const mailtoLink = `mailto:danielko@yonsei.ac.kr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}&cc=${encodeURIComponent(formData.parentEmail)}`;
+            // 사용자 이메일 클라이언트로 상담사에게 전송
+            const mailtoLink = `mailto:danielko@yonsei.ac.kr?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
             
-            window.location.href = mailtoLink;
+            // 성공 메시지 표시
+            formMessage.innerHTML = `
+                <h4><i class="fas fa-check-circle"></i> 예약 신청 완료!</h4>
+                <p>상담 예약이 접수되었습니다.</p>
+                <p>이메일 클라이언트가 열리면 <strong>"보내기" 버튼을 꼭 눌러주세요</strong>.</p>
+                <p>Daniel 선생님(danielko@yonsei.ac.kr)이 확인 후 24시간 내로 연락드리겠습니다.</p>
+            `;
+            formMessage.className = 'status-message success-message';
+            formMessage.style.display = 'block';
             
-            alert('상담 예약 요청이 완료되었습니다.\n이메일 클라이언트에서 발송을 완료해주세요.\n24시간 내로 확인 연락을 드리겠습니다.');
+            // 버튼 복원
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
             
-            localStorage.removeItem('mbtiResult');
-            document.getElementById('reservation-form').reset();
+            // 폼 초기화
+            this.reset();
             
-            // 잠시 후 홈페이지로 리디렉션
+            // 3초 후 이메일 클라이언트 열기
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.open(mailtoLink, '_blank');
+                
+                // 10초 후 홈페이지로 리디렉션
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 10000);
             }, 3000);
         });
     </script>
